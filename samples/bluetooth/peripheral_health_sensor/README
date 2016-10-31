@@ -1,0 +1,8 @@
+For building shell with Nordic Bluetooth Low Energy stack (NBLE)
+use prj_nble.conf:
+
+For X86 App
+$ make pristine && make CONF_FILE=prj_x86_nimble.conf BOARD=arduino_101_factory
+
+For ARC Sensor Module
+$ make pristine && make BOARD=arduino_101_sss_factory ARCH=arc

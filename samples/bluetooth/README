@@ -1,0 +1,58 @@
+Bluetooth subsystem
+
+= Building =
+
+Build samples
+
+$ make -C samples/bluetooth/<app>
+
+= Bluetooth Sample application =
+
+Host Bluetooth controller is connected to the second qemu serial line
+through a UNIX socket (qemu option -serial unix:/tmp/bt-server-bredr).
+This option is already added to qemu through QEMU_EXTRA_FLAGS in Makefile.
+
+On the host side BlueZ allows to "connect" Bluetooth controller through
+a so-called user channel. Use the btproxy tool for that:
+
+$ sudo tools/btproxy -u
+Listening on /tmp/bt-server-bredr
+
+Note that before calling btproxy make sure that Bluetooth controller is down.
+
+Now running qemu result connecting second serial line to 'bt-server-bredr'
+UNIX socket. When Bluetooth (CONFIG_BLUETOOTH) and Bluetooth HCI UART driver
+(CONFIG_BLUETOOTH_H4) are enabled, Bluetooth driver registers to the system.
+From now on Bluetooth might be used by the application. To run application in
+the qemu run:
+
+$ make qemu
+
+== Bluetooth IPSP application ==
+
+To test IPSP please take a look at samples/net/README, in addition to running
+echo-client it is necessary to enable 6LowPAN module in Linux with the
+following commands:
+
+$ modprobe bluetooth_6lowpan
+$ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
+
+Then to connect:
+
+echo "connect <bdaddr> <type>" > /sys/kernel/debug/bluetooth/6lowpan_control
+
+Once connected a dedicated interface will be created, usually bt0, which can
+then be used as following:
+
+$ echo-client -i bt0 <ip>
+
+= Bluetooth sanity check =
+
+There is smoke test application in nanokernel and microkernel test
+directories which gets run in sanity check script:
+
+$ scripts/sanity_chk/sanitycheck [-P <platform>]
+
+To only run Bluetooth tests use the -t bluetooth switch:
+
+$ scripts/sanity_chk/sanitycheck -t bluetooth
